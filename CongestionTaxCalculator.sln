@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CongestionTaxCalculator", "CongestionTaxCalculator\CongestionTaxCalculator.csproj", "{3AB5C9E4-0BF8-4B31-8A8E-124A8BA58280}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AB5C9E4-0BF8-4B31-8A8E-124A8BA58280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AB5C9E4-0BF8-4B31-8A8E-124A8BA58280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AB5C9E4-0BF8-4B31-8A8E-124A8BA58280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AB5C9E4-0BF8-4B31-8A8E-124A8BA58280}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
