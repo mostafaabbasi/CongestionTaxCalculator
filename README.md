@@ -48,6 +48,32 @@ The **Congestion Tax Calculator** is a sophisticated API designed to calculate c
 
 ---
 
+## 🛠️ Technology Stack
+
+### Backend
+- **.NET 9.0** - Latest .NET framework with C# 12
+- **ASP.NET Core Minimal APIs** - Lightweight, high-performance endpoints
+- **Entity Framework Core 9.0** - ORM for database operations
+- **SQL Server 2022** - Relational database
+
+### Libraries & Frameworks
+- **MediatR** - CQRS pattern implementation
+- **FluentValidation** - Input validation
+- **Asp.Versioning** - API versioning support
+- **Swashbuckle** - Swagger/OpenAPI documentation
+
+### Testing
+- **xUnit** - Testing framework
+- **FluentAssertions** - Fluent assertion library
+- **Moq** - Mocking framework
+- **EF Core InMemory** - In-memory database for testing
+
+### DevOps & Tools
+- **Docker** - Containerization
+- **Docker Compose** - Multi-container orchestration
+
+---
+
 ## ✨ Features
 
 ### Core Functionality
@@ -149,39 +175,108 @@ dotnet watch run --project CongestionTaxCalculator
 
 ## 🏗️ Architecture
 
-This project follows **Clean Architecture** principles to create a decoupled, testable, and maintainable system.
+This project follows **Clean Architecture** principles combined with **Vertical Slice Architecture** to create a maintainable, testable system organized by features.
 
-- **Domain Layer**: Contains core business logic, entities, and value objects. It has no dependencies on other layers.
-- **Application Layer**: Implements business logic using CQRS (MediatR). It depends only on the Domain layer.
-- **Infrastructure Layer**: Handles external concerns like database access (EF Core), file systems, etc.
-- **Presentation Layer**: The API endpoints (Minimal APIs) that expose the application's functionality.
+### Architecture Layers
 
-<div align="center">
-  <img src="https://i.imgur.com/A8W4G3g.png" alt="Clean Architecture Diagram" width="600">
-</div>
+- **Domain Layer** (`Domain/`): Core business entities, value objects, and enums. Pure domain logic with zero dependencies.
+  - `Entities/`: Domain entities (City, CongestionTaxCalculation, TollFeeSchedule, TollFreeDate)
+  - `ValueObjects/`: Value objects (Passage)
+  - `Enums/`: Domain enumerations (VehicleType)
+
+- **Application Layer** (`Features/`): Business logic organized by feature using CQRS pattern with MediatR.
+  - Each feature contains Commands, Queries, DTOs, and Validators
+  - Features depend only on Domain layer
+
+- **Infrastructure Layer** (`Infrastructure/`): External concerns and data persistence.
+  - `Persistence/`: EF Core DbContext and configurations
+  - `Migrations/`: Database migrations
+
+- **Presentation Layer** (`Endpoints/`): Minimal API endpoints that map to features.
+  - Organized by feature, using endpoint mapping extensions
+
+- **Cross-Cutting** (`Extensions/`): Shared utilities and extension methods (Swagger, etc.)
+
+### Key Design Patterns
+
+- ✅ **CQRS**: Commands and Queries separated using MediatR
+- ✅ **Vertical Slice Architecture**: Features organized by business capability
+- ✅ **Repository Pattern**: Abstracted through EF Core DbContext
+- ✅ **Dependency Injection**: Built-in .NET DI container
+- ✅ **Validation**: FluentValidation for input validation
+- ✅ **API Versioning**: Version 1.0 with extensibility for future versions
 
 ---
 
 ## 📂 Project Structure
 
 ```
-.
-├── CongestionTaxCalculator/          # Main API project (Presentation)
-│   ├── Domain/                       # Domain Layer
-│   │   ├── Entities/                 # City, CongestionTaxCalculation
-│   │   ├── Enums/                    # VehicleType
-│   │   └── ValueObjects/             # Passage
-│   ├── Features/                     # Application Layer (CQRS)
-│   │   └── Tax/Commands/             # Calculate tax command
-│   ├── Infrastructure/               # Infrastructure Layer
-│   │   └── Persistence/              # DbContext and migrations
-│   └── Endpoints/                    # API endpoints
-├── CongestionTaxCalculator.Tests/    # Unit and integration tests
-│   ├── Domain/                       # Domain tests
-│   └── Features/                     # Feature tests
-├── Dockerfile                        # Multi-stage Docker build with tests
-├── compose.yaml                      # Main Docker Compose configuration
-└── compose.test.yaml                 # Test-specific Docker Compose
+CongestionTaxCalculator/
+├── CongestionTaxCalculator/              # Main API project
+│   ├── Domain/                           # 🟦 Domain Layer (Core Business Logic)
+│   │   ├── Entities/
+│   │   │   ├── City.cs                   # City entity with toll rules
+│   │   │   ├── CongestionTaxCalculation.cs  # Tax calculation engine
+│   │   │   ├── TollFeeSchedule.cs        # Time-based fee schedules
+│   │   │   └── TollFreeDate.cs           # Holiday and toll-free dates
+│   │   ├── Enums/
+│   │   │   └── VehicleType.cs            # Vehicle type enumeration
+│   │   └── ValueObjects/
+│   │       └── Passage.cs                # Passage value object
+│   │
+│   ├── Features/                         # 🟩 Application Layer (CQRS Features)
+│   │   └── Tax/
+│   │       ├── Commands/
+│   │       │   └── CalculateTax/         # Calculate tax command handler
+│   │       └── Dtos/
+│   │           ├── Requests/             # Request DTOs
+│   │           └── Responses/            # Response DTOs
+│   │
+│   ├── Endpoints/                        # 🟨 Presentation Layer (API Endpoints)
+│   │   └── Tax/
+│   │       └── Commands/
+│   │           └── CalculateTax/         # Endpoint mapping
+│   │
+│   ├── Infrastructure/                   # 🟧 Infrastructure Layer
+│   │   ├── Persistence/
+│   │   │   └── CongestionTaxDbContext.cs # EF Core DbContext
+│   │   └── Migrations/                   # Database migrations
+│   │
+│   ├── Extensions/                       # Cross-cutting concerns
+│   │   └── SwaggerExtensions.cs          # Swagger configuration
+│   │
+│   ├── Program.cs                        # Application entry point
+│   ├── appsettings.json                  # Configuration
+│   └── appsettings.Development.json      # Development settings
+│
+├── CongestionTaxCalculator.Tests/        # 🧪 Test Project
+│   ├── Domain/                           # Domain layer tests
+│   │   ├── VehicleTypeExtensionsTests.cs
+│   │   ├── CityTests.cs
+│   │   └── CongestionTaxCalculationTests.cs
+│   └── Features/                         # Feature/Integration tests
+│       ├── CalculateTaxCommandHandlerTests.cs
+│       └── CalculateTaxValidatorTests.cs
+│
+├── Dockerfile                            # Multi-stage Docker build
+├── compose.yaml                          # Main Docker Compose file
+├── compose.test.yaml                     # Test-specific Docker Compose
+├── CongestionTaxCalculator.sln           # Solution file
+└── README.md                             # This file
+```
+
+### Layer Dependencies
+
+```
+┌─────────────────────────────────────────────────┐
+│         Presentation (Endpoints)                │
+│              ↓ depends on                       │
+│         Application (Features)                  │
+│              ↓ depends on                       │
+│            Domain (Entities)                    │
+└─────────────────────────────────────────────────┘
+            ↑ referenced by
+    Infrastructure (Persistence)
 ```
 
 ---
@@ -348,21 +443,100 @@ docker build --target test -t congestion-tax-tests .
 
 ### Prerequisites
 
-- .NET 9.0 SDK
-- Docker & Docker Compose
-- SQL Server (can be run via Docker)
+- **.NET 9.0 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Docker Desktop** - [Download](https://www.docker.com/products/docker-desktop)
+- **SQL Server 2022** (optional, can run via Docker)
+- **IDE**: Visual Studio 2022, JetBrains Rider, or VS Code
 
-### Setup
-
-1. **Clone the repository**
-2. **Restore packages**: `dotnet restore`
-3. **Run migrations**: `dotnet ef database update --project CongestionTaxCalculator`
-4. **Run the app**: `dotnet run --project CongestionTaxCalculator`
-
-### Add a Migration
+### Initial Setup
 
 ```bash
+# 1. Clone the repository
+git clone <repository-url>
+cd CongestionTaxCalculator
+
+# 2. Restore NuGet packages
+dotnet restore
+
+# 3. Start SQL Server (via Docker)
+docker compose up sqlserver -d
+
+# 4. Apply database migrations
+dotnet ef database update --project CongestionTaxCalculator
+
+# 5. Run the application
+dotnet run --project CongestionTaxCalculator
+
+# 6. Open Swagger UI
+open http://localhost:5032/swagger
+```
+
+### Development Workflow
+
+**Hot Reload Development:**
+```bash
+# Watch mode with automatic restart on code changes
+dotnet watch run --project CongestionTaxCalculator
+```
+
+**Running Tests During Development:**
+```bash
+# Run tests in watch mode
+dotnet watch test --project CongestionTaxCalculator.Tests
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~CityTests"
+```
+
+### Database Migrations
+
+**Add New Migration:**
+```bash
 dotnet ef migrations add <MigrationName> --project CongestionTaxCalculator
+```
+
+**Update Database:**
+```bash
+dotnet ef database update --project CongestionTaxCalculator
+```
+
+**Remove Last Migration:**
+```bash
+dotnet ef migrations remove --project CongestionTaxCalculator
+```
+
+**Generate SQL Script:**
+```bash
+dotnet ef migrations script --project CongestionTaxCalculator --output migration.sql
+```
+
+### Building
+
+**Build the solution:**
+```bash
+dotnet build
+```
+
+**Build in Release mode:**
+```bash
+dotnet build -c Release
+```
+
+**Publish the application:**
+```bash
+dotnet publish -c Release -o ./publish
+```
+
+### Code Quality
+
+**Run tests:**
+```bash
+dotnet test
+```
+
+**Run tests with coverage:**
+```bash
+dotnet test --collect:"XPlat Code Coverage"
 ```
 
 ---
