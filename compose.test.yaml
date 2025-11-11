@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Dedicated test runner service
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    container_name: congestion-tax-test-runner
+    volumes:
+      - ./test-results:/src/CongestionTaxCalculator.Tests/TestResults
+    environment:
+      - DOTNET_ENVIRONMENT=Test
+    command: >
+      sh -c "echo '=== Running Unit Tests ===' &&
+             dotnet test /src/CongestionTaxCalculator.Tests/CongestionTaxCalculator.Tests.csproj 
+             --no-restore 
+             --verbosity normal 
+             --logger 'trx;LogFileName=test_results_$(date +%Y%m%d_%H%M%S).trx' 
+             --logger 'console;verbosity=detailed' 
+             --results-directory /src/CongestionTaxCalculator.Tests/TestResults &&
+             echo '=== Tests Completed ==='
+      "
+
+  # Test with coverage
+  test-coverage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    container_name: congestion-tax-test-coverage
+    volumes:
+      - ./test-results:/src/CongestionTaxCalculator.Tests/TestResults
+      - ./coverage:/src/coverage
+    environment:
+      - DOTNET_ENVIRONMENT=Test
+    command: >
+      sh -c "echo '=== Running Tests with Coverage ===' &&
+             dotnet test /src/CongestionTaxCalculator.Tests/CongestionTaxCalculator.Tests.csproj 
+             --no-restore 
+             --verbosity normal 
+             --collect:'XPlat Code Coverage' 
+             --results-directory /src/coverage &&
+             echo '=== Coverage Report Generated in ./coverage ==='
+      "
+

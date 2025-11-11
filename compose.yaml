@@ -19,10 +19,31 @@
       retries: 10
       start_period: 10s
 
+  # Unit tests service - runs tests and exits
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    container_name: congestion-tax-tests
+    profiles:
+      - test
+    volumes:
+      - ./test-results:/src/CongestionTaxCalculator.Tests/TestResults
+    command: >
+      sh -c "dotnet test /src/CongestionTaxCalculator.Tests/CongestionTaxCalculator.Tests.csproj 
+             --no-restore 
+             --verbosity normal 
+             --logger 'trx;LogFileName=test_results.trx' 
+             --logger 'console;verbosity=detailed' 
+             --results-directory /src/CongestionTaxCalculator.Tests/TestResults"
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        RUN_TESTS: "true"
     container_name: congestion-tax-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
