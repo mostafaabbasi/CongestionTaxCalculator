@@ -8,9 +8,11 @@
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/Tests-59%2B-success?style=for-the-badge)
 
+![CI](https://github.com/mostafaabbasi/CongestionTaxCalculator/workflows/CI%2FCD%20Pipeline/badge.svg)
+
 **A modern, production-ready .NET Web API for calculating congestion taxes with comprehensive business rules, clean architecture, and full test coverage.**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [API Documentation](#-api-documentation) • [Architecture](#-architecture) • [Testing](#-testing)
+[Features](#-features) • [Quick Start](#-quick-start) • [API Documentation](#-api-documentation) • [Architecture](#-architecture) • [Testing](#-testing) • [CI](#-ci)
 
 </div>
 
@@ -552,6 +554,56 @@ dotnet test --collect:"XPlat Code Coverage"
 ### `appsettings.json`
 
 The `appsettings.json` file contains default configurations for logging and connection strings. Use `appsettings.Development.json` or environment variables to override for local development.
+
+---
+
+## 🔄 CI
+
+This project uses **GitHub Actions** for continuous integration.
+
+### Automated CI Pipeline
+
+Runs on every push and pull request:
+
+- ✅ **Build & Test** - Compiles and runs all unit tests
+- 📊 **Code Coverage** - Generates coverage reports
+- 🐳 **Docker Build** - Validates Docker image builds
+- 🔍 **Code Quality** - Checks code formatting and style
+
+### PR Validation
+
+Enhanced checks for pull requests:
+- 📝 Conventional commit format validation
+- 📏 Automatic PR size labeling
+- ⚡ Fast build feedback
+- 🔎 Changed files detection
+
+### Status Checks
+
+All PRs must pass these checks:
+- ✅ Build & Test
+- ✅ Code Coverage (minimum 60%)
+- ✅ Docker Build
+
+### Running CI Steps Locally
+
+Test the same steps that run in CI:
+
+```bash
+# Restore dependencies
+dotnet restore
+
+# Build
+dotnet build --configuration Release
+
+# Run tests
+dotnet test --configuration Release
+
+# Build Docker image (tests are skipped in Docker build)
+docker build --build-arg RUN_TESTS=false -t congestion-tax-calculator .
+```
+
+See [CI Documentation](./.github/CI.md) for detailed information about the `ci.yml` workflow.
 
 ---
 
